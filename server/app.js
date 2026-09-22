@@ -224,7 +224,8 @@ export function createApp({
     res.status(status).json({
       error:
         status === 500
-          ? "No s’ha pogut guardar la inscripció. Torna-ho a provar."
+          ? error.publicMessage ||
+            "No s’ha pogut guardar la inscripció. Torna-ho a provar."
           : "El formulari no és vàlid o és massa gran.",
     });
   });
