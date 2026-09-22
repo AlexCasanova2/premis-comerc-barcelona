@@ -92,6 +92,15 @@ async function submit() {
       />
     </section>
 
+    <section class="form-intro wrap" aria-labelledby="intro-title">
+      <p class="eyebrow red-text">ENS HI ACOMPANYES?</p>
+      <h2 id="intro-title">Tu també formes part del premi.</h2>
+      <p>
+        Confirma la teva assistència a l’acte de lliurament del Premi Comerç de
+        Barcelona.
+      </p>
+    </section>
+
     <section
       id="inscripcio"
       class="registration wrap"
