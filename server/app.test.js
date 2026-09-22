@@ -7,7 +7,11 @@ import { createApp } from "./app.js";
 
 test("registration API validates, persists and reports storage failures", async (t) => {
   const dir = await mkdtemp(join(tmpdir(), "premi-test-"));
-  const server = createApp({ dataDir: dir }).listen(0, "127.0.0.1");
+  const server = createApp({
+    dataDir: dir,
+    adminUsername: "gestio",
+    adminPassword: "secret-test",
+  }).listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
   t.after(async () => {
     await new Promise((resolve) => server.close(resolve));
@@ -62,6 +66,33 @@ test("registration API validates, persists and reports storage failures", async 
   assert.equal(entries[0].consentiment, true);
   assert.ok(entries[0].createdAt);
   assert.notEqual(entries[0].id, entries[1].id);
+
+  const adminUrl = `http://127.0.0.1:${server.address().port}/api/admin`;
+  assert.equal((await fetch(`${adminUrl}/inscripcions`)).status, 401);
+  const authorization = `Basic ${Buffer.from("gestio:secret-test").toString("base64")}`;
+  const adminResponse = await fetch(`${adminUrl}/inscripcions`, {
+    headers: { Authorization: authorization },
+  });
+  assert.equal(adminResponse.status, 200);
+  const adminEntries = (await adminResponse.json()).registrations;
+  assert.equal(adminEntries.length, 2);
+  assert.equal(adminEntries[0].nomAcompanyant, "Acompanyant");
+
+  const csvResponse = await fetch(`${adminUrl}/inscripcions.csv`, {
+    headers: { Authorization: authorization },
+  });
+  assert.equal(csvResponse.status, 200);
+  assert.match(csvResponse.headers.get("content-type"), /text\/csv/);
+  assert.match(
+    csvResponse.headers.get("content-disposition"),
+    /inscripcions-premi-comerc-barcelona\.csv/,
+  );
+  const csvBytes = new Uint8Array(await csvResponse.arrayBuffer());
+  assert.deepEqual([...csvBytes.slice(0, 3)], [0xef, 0xbb, 0xbf]);
+  const csv = new TextDecoder().decode(csvBytes);
+  assert.match(csv, /"Prova"/);
+  assert.match(csv, /"Acompanyant"/);
+
   const failingServer = createApp({
     dataDir: join(dir, "inscripcions.jsonl"),
   }).listen(0, "127.0.0.1");
