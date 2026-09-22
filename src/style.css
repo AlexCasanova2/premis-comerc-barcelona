@@ -574,9 +574,12 @@ footer p {
     grid-template-columns: 1fr;
   }
   .hero-copy {
-    padding: 39px 0 12px;
+    padding: 39px 0 42px;
     position: relative;
     z-index: 1;
+  }
+  .hero-copy .primary-button {
+    width: 100%;
   }
   h1 {
     font-size: 43px;
@@ -676,12 +679,21 @@ footer p {
     padding-block: 28px;
     flex-direction: column;
     align-items: flex-start;
-    gap: 22px;
+    gap: 26px;
+  }
+  footer > div:first-child,
+  .footer-links {
+    width: 100%;
   }
   .footer-links {
-    gap: 19px;
-    flex-wrap: wrap;
+    display: grid;
+    gap: 0;
     font-size: 11px;
+    border-bottom: 1px solid var(--line);
+  }
+  .footer-links a {
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
   }
   .success-panel {
     padding-block: 25px;
