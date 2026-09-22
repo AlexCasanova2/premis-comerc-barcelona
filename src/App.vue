@@ -81,55 +81,15 @@ async function submit() {
   <a class="skip-link" href="#inscripcio">Vés al formulari</a>
   <main>
     <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-inner wrap">
-        <div class="hero-copy">
-          <h1 id="hero-title">
-            Premi Comerç<br />de Barcelona<span class="red-dot">.</span>
-          </h1>
-          <p class="hero-description">
-            Celebrem el talent, la dedicació i el compromís<br
-              class="desktop-break"
-            />
-            del comerç de la nostra ciutat.
-          </p>
-          <a class="primary-button" href="#inscripcio"
-            >Confirma la teva assistència <span aria-hidden="true">↓</span></a
-          >
-          <p class="hero-caption">Acte de lliurament dels guardons</p>
-        </div>
-        <div class="hero-art" aria-hidden="true">
-          <div class="tile tile-one"></div>
-          <div class="tile tile-two"></div>
-          <div class="tile tile-three"></div>
-          <div class="tile tile-four"></div>
-          <svg class="award-seal" viewBox="0 0 400 400">
-            <defs>
-              <path
-                id="seal-ring"
-                d="M 200, 200 m -132, 0 a 132,132 0 1,1 264,0 a 132,132 0 1,1 -264,0"
-              />
-            </defs>
-            <path
-              fill="currentColor"
-              d="M200 7 238 30 284 26 305 67 347 86 350 132 381 166 363 209 371 254 335 283 320 327 274 335 241 368 198 353 154 371 122 337 77 326 66 281 31 252 41 207 23 164 54 130 59 84 102 66 124 26 169 31Z"
-            />
-            <text class="seal-ring">
-              <textPath
-                href="#seal-ring"
-                startOffset="0%"
-                textLength="820"
-                lengthAdjust="spacing"
-              >
-                BARCELONA · COMERÇ · BARCELONA · COMERÇ ·
-              </textPath>
-            </text>
-            <text x="200" y="178" class="seal-title">PREMI</text>
-            <text x="200" y="235" class="seal-title">COMERÇ</text>
-            <path d="M178 265h44M200 254v22" stroke="white" stroke-width="2" />
-          </svg>
-          <span class="art-caption">EL RECONEIXEMENT AL NOSTRE COMERÇ</span>
-        </div>
-      </div>
+      <h1 id="hero-title" class="sr-only">Premi Comerç de Barcelona 2026</h1>
+      <img
+        class="hero-banner"
+        src="/banner-premi-comerc-2026.png"
+        alt="Barcelona, Capital Europea del Comerç Local 2026. Premi Comerç Barcelona 2026."
+        width="1920"
+        height="444"
+        fetchpriority="high"
+      />
     </section>
 
     <section
