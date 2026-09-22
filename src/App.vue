@@ -375,15 +375,15 @@ async function submit() {
 
   <footer class="wrap">
     <div>
-      <span class="footer-brand"
-        >Barcelona<span aria-hidden="true">✳</span></span
-      >
+      <img
+        class="footer-brand"
+        src="/AJBCN_Sign_Com_Negre_Transparent.svg"
+        alt="Ajuntament de Barcelona"
+      />
       <p>Ajuntament de Barcelona · Comerç</p>
     </div>
     <div class="footer-links">
       <a href="https://ajuntament.barcelona.cat/ca/avis-legal">Avís legal</a
-      ><a href="https://ajuntament.barcelona.cat/ca/proteccio-de-dades"
-        >Protecció de dades</a
       ><a :href="officialUrl"
         >Web de Comerç <span aria-hidden="true">↗</span></a
       >

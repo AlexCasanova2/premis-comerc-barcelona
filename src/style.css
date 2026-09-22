@@ -447,12 +447,9 @@ footer {
   min-height: 135px;
 }
 .footer-brand {
-  font-size: 24px;
-  letter-spacing: -1.5px;
-  font-family: Arial, sans-serif;
-}
-.footer-brand > span {
-  margin-left: 4px;
+  display: block;
+  width: 178px;
+  height: auto;
 }
 .footer-links {
   display: flex;
