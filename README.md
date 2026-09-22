@@ -36,6 +36,16 @@ ADMIN_USERNAME=admin ADMIN_PASSWORD='una-contrasena-segura' npm start
 
 El CRM permite consultar todas las inscripciones, buscar por persona, correo, teléfono o entidad y descargar el conjunto completo en un CSV UTF-8 compatible con Excel. Las credenciales solo se conservan en la sesión actual del navegador.
 
+### Despliegue en Vercel
+
+El proyecto incluye `vercel.json` para servir `/admin` y dirigir las peticiones `/api/*` a la función de Express. Las inscripciones se guardan como objetos JSON privados en Vercel Blob, ya que el sistema de archivos de las funciones de Vercel no es persistente.
+
+1. En Vercel, abre **Storage**, crea un almacén **Blob** y conéctalo al proyecto.
+2. Mantén `ADMIN_USERNAME` y `ADMIN_PASSWORD` en **Settings → Environment Variables**.
+3. Despliega de nuevo el proyecto. Vercel proporciona automáticamente las credenciales del almacén Blob conectado.
+
+Para ejecutar la función de Vercel fuera de la plataforma también se necesita `BLOB_READ_WRITE_TOKEN`. El servidor local iniciado con `npm start` continúa utilizando `DATA_DIR` y no requiere Blob.
+
 ## Formulario
 
 Campos del CSV original: nombre, apellido, email, teléfono, acompañante sí/no, nombre y apellido del acompañante (condicionales), entidad/asociación, dirección de la entidad, confirmación de asistencia, asistencia por movilidad reducida y consentimiento. Los metadatos de Elementor no son campos del formulario.

@@ -38,22 +38,36 @@ export function createApp({
   distDir = resolve("dist"),
   adminUsername = process.env.ADMIN_USERNAME || "admin",
   adminPassword = process.env.ADMIN_PASSWORD || "",
+  storage,
 } = {}) {
   const app = express();
   const registrationsFile = resolve(dataDir, "inscripcions.jsonl");
 
+  const registrationStorage = storage || {
+    async list() {
+      try {
+        const contents = await readFile(registrationsFile, "utf8");
+        return contents
+          .split("\n")
+          .filter(Boolean)
+          .map((line) => JSON.parse(line));
+      } catch (error) {
+        if (error.code === "ENOENT") return [];
+        throw error;
+      }
+    },
+    async save(entry) {
+      await mkdir(dataDir, { recursive: true, mode: 0o700 });
+      await appendFile(registrationsFile, JSON.stringify(entry) + "\n", {
+        mode: 0o600,
+      });
+    },
+  };
+
   async function registrations() {
-    try {
-      const contents = await readFile(registrationsFile, "utf8");
-      return contents
-        .split("\n")
-        .filter(Boolean)
-        .map((line) => JSON.parse(line))
-        .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
-    } catch (error) {
-      if (error.code === "ENOENT") return [];
-      throw error;
-    }
+    return (await registrationStorage.list()).sort((a, b) =>
+      String(b.createdAt).localeCompare(String(a.createdAt)),
+    );
   }
 
   function requireAdmin(req, res, next) {
@@ -156,10 +170,7 @@ export function createApp({
         id: randomUUID(),
         createdAt: new Date().toISOString(),
       });
-      await mkdir(dataDir, { recursive: true, mode: 0o700 });
-      await appendFile(registrationsFile, JSON.stringify(entry) + "\n", {
-        mode: 0o600,
-      });
+      await registrationStorage.save(entry);
       return res.status(201).json({ ok: true, id: entry.id });
     } catch (error) {
       next(error);
