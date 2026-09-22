@@ -79,32 +79,6 @@ async function submit() {
 
 <template>
   <a class="skip-link" href="#inscripcio">Vés al formulari</a>
-  <header>
-    <div class="institutional-bar wrap">
-      <a
-        class="barcelona"
-        href="https://ajuntament.barcelona.cat/"
-        aria-label="Ajuntament de Barcelona"
-        >Barcelona<span class="city-symbol" aria-hidden="true">✳</span></a
-      >
-      <span class="language"
-        ><span aria-hidden="true">◎</span> Català
-        <span class="language-code">CA</span></span
-      >
-    </div>
-    <div class="navigation-border">
-      <nav class="navigation wrap" aria-label="Navegació principal">
-        <a class="site-name" :href="officialUrl"
-          >Comerç<span class="site-divider"></span
-          ><span class="site-section">Premi Comerç de Barcelona</span></a
-        >
-        <a class="nav-link" href="#inscripcio"
-          >Inscripció a l’acte <span aria-hidden="true">↗</span></a
-        >
-      </nav>
-    </div>
-  </header>
-
   <main>
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-inner wrap">

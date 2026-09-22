@@ -52,80 +52,6 @@ input:focus-visible,
   margin: 0 auto;
   padding: 0 32px;
 }
-.institutional-bar {
-  height: 72px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.barcelona {
-  font-family: Arial, sans-serif;
-  color: #d72331;
-  font-size: 30px;
-  letter-spacing: -1.8px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.city-symbol {
-  font-size: 36px;
-  line-height: 1;
-}
-.language {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 12px;
-}
-.language > span:first-child {
-  font-size: 22px;
-}
-.language-code {
-  font-size: 10px;
-  background: #f1f1ef;
-  padding: 4px 5px;
-  color: #71716e;
-  margin-left: 7px;
-}
-.navigation-border {
-  border-block: 1px solid var(--line);
-}
-.navigation {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 72px;
-  gap: 20px;
-}
-.site-name {
-  display: flex;
-  align-items: center;
-  font-family: "Manrope", Arial, sans-serif;
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -1px;
-}
-.site-divider {
-  width: 1px;
-  height: 25px;
-  background: #d7d7d3;
-  margin: 0 24px;
-}
-.site-section {
-  font-family: "DM Sans", sans-serif;
-  font-size: 13px;
-  font-weight: 450;
-  letter-spacing: 0;
-}
-.nav-link {
-  font-size: 12px;
-  font-weight: 600;
-}
-.nav-link span {
-  color: var(--red);
-  font-size: 19px;
-  margin-left: 20px;
-}
 .hero {
   background: var(--cream);
   overflow: hidden;
@@ -601,8 +527,7 @@ footer p {
   color: #73736e;
   margin: 8px 0 0;
 }
-.footer-links a:hover,
-.nav-link:hover {
+.footer-links a:hover {
   color: var(--red);
 }
 .success-panel {
@@ -675,12 +600,6 @@ footer p {
   .wrap {
     padding-inline: 24px;
   }
-  .site-section {
-    font-size: 11px;
-  }
-  .site-divider {
-    margin-inline: 16px;
-  }
   .hero-inner {
     gap: 0;
   }
@@ -716,34 +635,6 @@ footer p {
 @media (max-width: 640px) {
   .wrap {
     padding-inline: 22px;
-  }
-  .institutional-bar {
-    height: 60px;
-  }
-  .barcelona {
-    font-size: 26px;
-  }
-  .city-symbol {
-    font-size: 29px;
-  }
-  .language-code {
-    display: none;
-  }
-  .navigation {
-    min-height: 62px;
-  }
-  .site-name {
-    font-size: 24px;
-  }
-  .site-section,
-  .site-divider {
-    display: none;
-  }
-  .nav-link {
-    font-size: 11px;
-  }
-  .nav-link span {
-    margin-left: 8px;
   }
   .hero-inner {
     grid-template-columns: 1fr;
