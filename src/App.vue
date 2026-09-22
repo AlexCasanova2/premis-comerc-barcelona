@@ -1,0 +1,452 @@
+<script setup>
+import { nextTick, reactive, ref, watch } from "vue";
+
+const officialUrl =
+  "https://ajuntament.barcelona.cat/comerc/ca/tens-un-establiment/premi-comerc-de-barcelona";
+const initialForm = () => ({
+  nom: "",
+  cognom: "",
+  email: "",
+  telefon: "",
+  acompanyant: "",
+  nomAcompanyant: "",
+  cognomAcompanyant: "",
+  entitat: "",
+  adreca: "",
+  assistencia: "",
+  mobilitat: "",
+  consentiment: false,
+});
+const form = reactive(initialForm());
+const pending = ref(false);
+const success = ref(false);
+const error = ref("");
+const successPanel = ref(null);
+const questions = [
+  {
+    key: "assistencia",
+    label: "Confirmació d’assistència",
+    hint: "Confirma si assistiràs a l’acte de lliurament.",
+  },
+  {
+    key: "mobilitat",
+    label: "Requereixes algun tipus d’assistència per mobilitat reduïda?",
+    hint: "Volem que puguis gaudir de l’acte amb totes les comoditats.",
+  },
+];
+watch(
+  () => form.acompanyant,
+  (value) => {
+    if (value !== "Sí") {
+      form.nomAcompanyant = "";
+      form.cognomAcompanyant = "";
+    }
+  },
+);
+
+async function submit() {
+  if (pending.value) return;
+  pending.value = true;
+  error.value = "";
+  try {
+    const response = await fetch("/api/inscripcions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+      signal: AbortSignal.timeout(20000),
+    });
+    const result = await response.json();
+    if (!response.ok || !result.ok)
+      throw new Error(
+        result.error ||
+          "No s’ha pogut enviar la inscripció. Torna-ho a provar.",
+      );
+    success.value = true;
+    Object.assign(form, initialForm());
+    await nextTick();
+    successPanel.value?.focus();
+    successPanel.value?.scrollIntoView({ behavior: "smooth", block: "center" });
+  } catch (cause) {
+    error.value =
+      cause.name === "TimeoutError" || cause instanceof TypeError
+        ? "No hem pogut connectar amb el servidor. Comprova la connexió i torna-ho a provar."
+        : cause.message;
+  } finally {
+    pending.value = false;
+  }
+}
+</script>
+
+<template>
+  <a class="skip-link" href="#inscripcio">Vés al formulari</a>
+  <header>
+    <div class="institutional-bar wrap">
+      <a
+        class="barcelona"
+        href="https://ajuntament.barcelona.cat/"
+        aria-label="Ajuntament de Barcelona"
+        >Barcelona<span class="city-symbol" aria-hidden="true">✳</span></a
+      >
+      <span class="language"
+        ><span aria-hidden="true">◎</span> Català
+        <span class="language-code">CA</span></span
+      >
+    </div>
+    <div class="navigation-border">
+      <nav class="navigation wrap" aria-label="Navegació principal">
+        <a class="site-name" :href="officialUrl"
+          >Comerç<span class="site-divider"></span
+          ><span class="site-section">Premi Comerç de Barcelona</span></a
+        >
+        <a class="nav-link" href="#inscripcio"
+          >Inscripció a l’acte <span aria-hidden="true">↗</span></a
+        >
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-inner wrap">
+        <div class="hero-copy">
+          <p class="eyebrow"><span></span> EL COMERÇ QUE FA CIUTAT</p>
+          <h1 id="hero-title">
+            Premi Comerç<br />de Barcelona<span class="red-dot">.</span>
+          </h1>
+          <p class="hero-description">
+            Celebrem el talent, la dedicació i el compromís<br
+              class="desktop-break"
+            />
+            del comerç de la nostra ciutat.
+          </p>
+          <a class="primary-button" href="#inscripcio"
+            >Confirma la teva assistència <span aria-hidden="true">↓</span></a
+          >
+          <p class="hero-caption">Acte de lliurament dels guardons</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="tile tile-one"></div>
+          <div class="tile tile-two"></div>
+          <div class="tile tile-three"></div>
+          <div class="tile tile-four"></div>
+          <svg class="award-seal" viewBox="0 0 400 400">
+            <defs>
+              <path
+                id="seal-ring"
+                d="M 200, 200 m -132, 0 a 132,132 0 1,1 264,0 a 132,132 0 1,1 -264,0"
+              />
+            </defs>
+            <path
+              fill="currentColor"
+              d="M200 7 238 30 284 26 305 67 347 86 350 132 381 166 363 209 371 254 335 283 320 327 274 335 241 368 198 353 154 371 122 337 77 326 66 281 31 252 41 207 23 164 54 130 59 84 102 66 124 26 169 31Z"
+            />
+            <text class="seal-ring">
+              <textPath
+                href="#seal-ring"
+                startOffset="0%"
+                textLength="820"
+                lengthAdjust="spacing"
+              >
+                BARCELONA · COMERÇ · BARCELONA · COMERÇ ·
+              </textPath>
+            </text>
+            <text x="200" y="178" class="seal-title">PREMI</text>
+            <text x="200" y="235" class="seal-title">COMERÇ</text>
+            <path d="M178 265h44M200 254v22" stroke="white" stroke-width="2" />
+          </svg>
+          <span class="art-caption">EL RECONEIXEMENT AL NOSTRE COMERÇ</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="breadcrumb wrap">
+      <a :href="officialUrl">Premi Comerç de Barcelona</a
+      ><span aria-hidden="true">/</span><span>Inscripció a l’acte</span>
+    </div>
+
+    <section
+      id="inscripcio"
+      class="registration wrap"
+      aria-labelledby="registration-title"
+    >
+      <aside class="registration-intro">
+        <p class="eyebrow red-text">ENS HI ACOMPANYES?</p>
+        <h2 id="registration-title">Tu també formes<br /> part del premi.</h2>
+        <p>
+          Un reconeixement a les persones, els establiments i les entitats que
+          donen vida als nostres barris.
+        </p>
+        <p>
+          Omple el formulari per confirmar la teva assistència a l’acte de
+          lliurament del Premi Comerç de Barcelona.
+        </p>
+        <div class="intro-note">
+          <span class="note-icon" aria-hidden="true">↗</span>
+          <div>
+            <strong>Una ciutat. Molt de comerç.</strong>
+            <p>Gràcies per fer-lo possible cada dia.</p>
+          </div>
+        </div>
+        <a
+          class="text-link"
+          :href="officialUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Coneix el Premi Comerç <span aria-hidden="true">↗</span
+          ><span class="sr-only"> (s’obre en una pestanya nova)</span></a
+        >
+      </aside>
+
+      <div class="form-card">
+        <div
+          v-if="success"
+          ref="successPanel"
+          class="success-panel"
+          role="status"
+          tabindex="-1"
+        >
+          <span class="success-icon" aria-hidden="true">✓</span>
+          <p class="eyebrow red-text">GRÀCIES PER INSCRIURE’T</p>
+          <h2>Inscripció rebuda correctament.</h2>
+          <p>
+            Hem rebut les teves dades i la teva resposta d’assistència al Premi
+            Comerç de Barcelona.
+          </p>
+          <a class="text-link" :href="officialUrl"
+            >Més sobre el premi <span aria-hidden="true">↗</span></a
+          >
+        </div>
+        <form v-else @submit.prevent="submit" :aria-busy="pending">
+          <div class="form-heading">
+            <h2>Inscripció a l’acte</h2>
+            <p>
+              Els camps marcats amb <span class="required">*</span> són
+              obligatoris.
+            </p>
+          </div>
+          <fieldset :disabled="pending" class="form-section">
+            <legend>
+              <span class="section-number">01</span> Les teves dades
+            </legend>
+            <div class="field-grid">
+              <label for="nom"
+                >Nom <span class="required">*</span
+                ><input
+                  id="nom"
+                  v-model.trim="form.nom"
+                  name="given-name"
+                  autocomplete="given-name"
+                  placeholder="El teu nom"
+                  required
+                  maxlength="150"
+              /></label>
+              <label for="cognom"
+                >Cognom <span class="required">*</span
+                ><input
+                  id="cognom"
+                  v-model.trim="form.cognom"
+                  name="family-name"
+                  autocomplete="family-name"
+                  placeholder="El teu cognom"
+                  required
+                  maxlength="150"
+              /></label>
+              <label for="email"
+                >Correu electrònic <span class="required">*</span
+                ><input
+                  id="email"
+                  v-model.trim="form.email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="nom@exemple.cat"
+                  required
+                  maxlength="254"
+              /></label>
+              <label for="telefon"
+                >Telèfon <span class="required">*</span
+                ><input
+                  id="telefon"
+                  v-model.trim="form.telefon"
+                  name="tel"
+                  type="tel"
+                  autocomplete="tel"
+                  placeholder="El teu telèfon"
+                  required
+                  pattern="[+0-9\(\) .\-]{6,25}"
+                  maxlength="25"
+                  title="Introdueix un telèfon vàlid, amb entre 6 i 25 caràcters."
+              /></label>
+            </div>
+          </fieldset>
+
+          <fieldset :disabled="pending" class="form-section">
+            <legend>
+              <span class="section-number">02</span> Entitat o associació
+            </legend>
+            <div class="field-grid">
+              <label class="full-width" for="entitat"
+                >Nom de l’entitat i/o l’associació a la qual pertanys
+                <span class="required">*</span
+                ><input
+                  id="entitat"
+                  v-model.trim="form.entitat"
+                  name="organization"
+                  autocomplete="organization"
+                  placeholder="Nom de l’entitat o associació"
+                  required
+                  maxlength="300"
+              /></label>
+              <label class="full-width" for="adreca"
+                >Adreça de l’entitat <span class="required">*</span
+                ><input
+                  id="adreca"
+                  v-model.trim="form.adreca"
+                  name="street-address"
+                  autocomplete="street-address"
+                  placeholder="Carrer, número i població"
+                  required
+                  maxlength="500"
+              /></label>
+            </div>
+          </fieldset>
+
+          <fieldset :disabled="pending" class="form-section attendance-section">
+            <legend>
+              <span class="section-number">03</span> La teva assistència
+            </legend>
+            <fieldset class="question">
+              <legend>
+                Portaràs acompanyant? <span class="required">*</span>
+              </legend>
+              <div class="radio-options">
+                <label
+                  v-for="answer in ['Sí', 'No']"
+                  :key="answer"
+                  class="radio-option"
+                  :class="{ selected: form.acompanyant === answer }"
+                  ><input
+                    v-model="form.acompanyant"
+                    type="radio"
+                    name="acompanyant"
+                    :value="answer"
+                    required
+                  />{{ answer }}</label
+                >
+              </div>
+            </fieldset>
+            <div
+              v-if="form.acompanyant === 'Sí'"
+              class="field-grid companion-fields"
+            >
+              <label for="nom-acompanyant"
+                >Nom de l’acompanyant <span class="required">*</span
+                ><input
+                  id="nom-acompanyant"
+                  v-model.trim="form.nomAcompanyant"
+                  required
+                  maxlength="150"
+                  autocomplete="off"
+              /></label>
+              <label for="cognom-acompanyant"
+                >Cognom de l’acompanyant <span class="required">*</span
+                ><input
+                  id="cognom-acompanyant"
+                  v-model.trim="form.cognomAcompanyant"
+                  required
+                  maxlength="150"
+                  autocomplete="off"
+              /></label>
+            </div>
+            <fieldset
+              v-for="question in questions"
+              :key="question.key"
+              class="question"
+            >
+              <legend>
+                {{ question.label }} <span class="required">*</span>
+              </legend>
+              <p :id="`${question.key}-hint`" class="field-hint">
+                {{ question.hint }}
+              </p>
+              <div class="radio-options">
+                <label
+                  v-for="answer in ['Sí', 'No']"
+                  :key="answer"
+                  class="radio-option"
+                  :class="{ selected: form[question.key] === answer }"
+                  ><input
+                    v-model="form[question.key]"
+                    type="radio"
+                    :name="question.key"
+                    :value="answer"
+                    :aria-describedby="`${question.key}-hint`"
+                    required
+                  />{{ answer }}</label
+                >
+              </div>
+            </fieldset>
+          </fieldset>
+
+          <div class="form-bottom">
+            <label class="consent"
+              ><input
+                v-model="form.consentiment"
+                type="checkbox"
+                name="consentiment"
+                required
+                :disabled="pending"
+              /><span
+                >Accepto el tractament de les meves dades amb la finalitat
+                d’inscriure’m a l’activitat indicada, d’acord amb el tractament
+                0459 de promoció del comerç de Barcelona.
+                <span class="required">*</span></span
+              ></label
+            >
+            <p v-if="error" class="error-message" role="alert">{{ error }}</p>
+            <button
+              class="primary-button submit-button"
+              type="submit"
+              :disabled="pending"
+            >
+              {{ pending ? "Enviant inscripció…" : "Envia la inscripció"
+              }}<span aria-hidden="true">{{ pending ? "◌" : "→" }}</span>
+            </button>
+            <p class="submission-note">
+              Un cop enviat el formulari, veuràs la confirmació de recepció.
+            </p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="closing">
+      <div class="wrap">
+        <span class="closing-flower" aria-hidden="true">✳</span>
+        <p>
+          El comerç dona vida a Barcelona.<br /><strong
+            >I tu en formes part.</strong
+          >
+        </p>
+        <span class="closing-label">PREMI COMERÇ<br />DE BARCELONA</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div>
+      <span class="footer-brand"
+        >Barcelona<span aria-hidden="true">✳</span></span
+      >
+      <p>Ajuntament de Barcelona · Comerç</p>
+    </div>
+    <div class="footer-links">
+      <a href="https://ajuntament.barcelona.cat/ca/avis-legal">Avís legal</a
+      ><a href="https://ajuntament.barcelona.cat/ca/proteccio-de-dades"
+        >Protecció de dades</a
+      ><a :href="officialUrl"
+        >Web de Comerç <span aria-hidden="true">↗</span></a
+      >
+    </div>
+  </footer>
+</template>
