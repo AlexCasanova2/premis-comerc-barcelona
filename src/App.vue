@@ -4,6 +4,7 @@ import { nextTick, reactive, ref, watch } from "vue";
 const officialUrl =
   "https://ajuntament.barcelona.cat/comerc/ca/tens-un-establiment/premi-comerc-de-barcelona";
 const initialForm = () => ({
+  website: "",
   nom: "",
   cognom: "",
   email: "",
@@ -126,6 +127,16 @@ async function submit() {
           >
         </div>
         <form v-else @submit.prevent="submit" :aria-busy="pending">
+          <div class="honeypot" aria-hidden="true">
+            <label for="website"
+              >Lloc web<input
+                id="website"
+                v-model="form.website"
+                name="website"
+                tabindex="-1"
+                autocomplete="off"
+            /></label>
+          </div>
           <div class="form-heading">
             <h2 id="registration-title">Inscripció a l’acte</h2>
             <p>

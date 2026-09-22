@@ -1,8 +1,9 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
 
 const credentials = reactive({ username: "admin", password: "" });
-const auth = ref("");
+const auth = ref(false);
+let expiryTimer;
 const registrations = ref([]);
 const query = ref("");
 const loading = ref(false);
@@ -37,31 +38,52 @@ const stats = computed(() => ({
     .length,
 }));
 
-function basicAuth(username, password) {
-  const bytes = new TextEncoder().encode(`${username}:${password}`);
-  let binary = "";
-  bytes.forEach((byte) => (binary += String.fromCharCode(byte)));
-  return `Basic ${btoa(binary)}`;
+function clearSession() {
+  clearTimeout(expiryTimer);
+  auth.value = false;
+  registrations.value = [];
+  query.value = "";
 }
 
-async function loadRegistrations(authorization = auth.value) {
+function setSession(expiresAt) {
+  clearTimeout(expiryTimer);
+  auth.value = true;
+  expiryTimer = setTimeout(
+    () => {
+      clearSession();
+      error.value = "La sessió ha caducat. Torna a iniciar sessió.";
+    },
+    Math.max(0, expiresAt - Date.now()),
+  );
+}
+
+async function api(path, options = {}) {
+  const response = await fetch(path, {
+    ...options,
+    credentials: "same-origin",
+    cache: "no-store",
+    signal: AbortSignal.timeout(30000),
+  });
+  if (!response.ok) {
+    if (response.status === 401) clearSession();
+    const result = await response.json();
+    throw new Error(result.error || "No s’ha pogut completar l’operació.");
+  }
+  return response;
+}
+
+async function loadRegistrations() {
   loading.value = true;
   error.value = "";
   try {
-    const response = await fetch("/api/admin/inscripcions", {
-      headers: { Authorization: authorization },
-    });
+    const response = await api("/api/admin/inscripcions");
     const result = await response.json();
     if (!response.ok)
       throw new Error(
         result.error || "No s’han pogut carregar les inscripcions.",
       );
-    auth.value = authorization;
-    sessionStorage.setItem("premi-admin-auth", authorization);
-    registrations.value = result.registrations;
+    if (auth.value) registrations.value = result.registrations;
   } catch (cause) {
-    auth.value = "";
-    sessionStorage.removeItem("premi-admin-auth");
     error.value =
       cause instanceof TypeError
         ? "No s’ha pogut connectar amb el servidor."
@@ -72,32 +94,52 @@ async function loadRegistrations(authorization = auth.value) {
 }
 
 async function login() {
-  if (!credentials.username || !credentials.password) return;
-  await loadRegistrations(
-    basicAuth(credentials.username, credentials.password),
-  );
-  credentials.password = "";
+  if (loading.value || !credentials.username || !credentials.password) return;
+  loading.value = true;
+  error.value = "";
+  try {
+    const response = await api("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(credentials),
+    });
+    const result = await response.json();
+    setSession(result.expiresAt);
+    await loadRegistrations();
+  } catch (cause) {
+    error.value = cause.message;
+  } finally {
+    credentials.password = "";
+    loading.value = false;
+  }
 }
 
-function logout() {
-  auth.value = "";
-  registrations.value = [];
-  query.value = "";
-  sessionStorage.removeItem("premi-admin-auth");
+async function logout() {
+  clearSession();
+  try {
+    await api("/api/admin/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    });
+    error.value = "";
+  } catch {
+    error.value =
+      "No s’ha pogut revocar la sessió al servidor. Torna a provar de tancar-la.";
+  }
 }
 
 async function exportCsv() {
   exporting.value = true;
   error.value = "";
   try {
-    const response = await fetch("/api/admin/inscripcions.csv", {
-      headers: { Authorization: auth.value },
-    });
+    const response = await api("/api/admin/inscripcions.csv");
     if (!response.ok) {
       const result = await response.json();
       throw new Error(result.error || "No s’ha pogut exportar el CSV.");
     }
     const blob = await response.blob();
+    if (!auth.value) return;
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -119,11 +161,23 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
-onMounted(() => {
+onMounted(async () => {
   document.title = "Inscripcions · CRM Premi Comerç";
-  const savedAuth = sessionStorage.getItem("premi-admin-auth");
-  if (savedAuth) loadRegistrations(savedAuth);
+  // Remove credentials left by the previous Basic Auth implementation.
+  sessionStorage.removeItem("premi-admin-auth");
+  loading.value = true;
+  try {
+    const response = await api("/api/admin/session");
+    const result = await response.json();
+    setSession(result.expiresAt);
+    await loadRegistrations();
+  } catch {
+    clearSession();
+  } finally {
+    loading.value = false;
+  }
 });
+onUnmounted(() => clearTimeout(expiryTimer));
 </script>
 
 <template>
@@ -155,6 +209,9 @@ onMounted(() => {
             required
         /></label>
         <p v-if="error" class="admin-error" role="alert">{{ error }}</p>
+        <button v-if="error.includes('revocar')" type="button" @click="logout">
+          Torna a tancar la sessió
+        </button>
         <button type="submit" :disabled="loading">
           {{ loading ? "Entrant…" : "Entra al CRM" }}
           <span aria-hidden="true">→</span>

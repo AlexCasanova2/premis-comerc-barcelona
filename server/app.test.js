@@ -18,11 +18,20 @@ test("registration API validates, persists and reports storage failures", async 
     await rm(dir, { recursive: true, force: true });
   });
   const url = `http://127.0.0.1:${server.address().port}/api/inscripcions`;
+  let sequence = 0;
   const send = (body) =>
     fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+        Origin: new URL(url).origin,
+      },
+      body: JSON.stringify({
+        ...body,
+        ...(body.email === "prova@example.com"
+          ? { email: `prova${sequence++}@example.com` }
+          : {}),
+      }),
     });
   const valid = {
     nom: "Prova",
@@ -69,9 +78,18 @@ test("registration API validates, persists and reports storage failures", async 
 
   const adminUrl = `http://127.0.0.1:${server.address().port}/api/admin`;
   assert.equal((await fetch(`${adminUrl}/inscripcions`)).status, 401);
-  const authorization = `Basic ${Buffer.from("gestio:secret-test").toString("base64")}`;
+  const login = await fetch(`${adminUrl}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: new URL(url).origin,
+    },
+    body: JSON.stringify({ username: "gestio", password: "secret-test" }),
+  });
+  assert.equal(login.status, 200);
+  const cookie = login.headers.get("set-cookie").split(";")[0];
   const adminResponse = await fetch(`${adminUrl}/inscripcions`, {
-    headers: { Authorization: authorization },
+    headers: { Cookie: cookie },
   });
   assert.equal(adminResponse.status, 200);
   const adminEntries = (await adminResponse.json()).registrations;
@@ -79,7 +97,7 @@ test("registration API validates, persists and reports storage failures", async 
   assert.equal(adminEntries[0].nomAcompanyant, "Acompanyant");
 
   const csvResponse = await fetch(`${adminUrl}/inscripcions.csv`, {
-    headers: { Authorization: authorization },
+    headers: { Cookie: cookie },
   });
   assert.equal(csvResponse.status, 200);
   assert.match(csvResponse.headers.get("content-type"), /text\/csv/);
@@ -102,7 +120,10 @@ test("registration API validates, persists and reports storage failures", async 
     `http://127.0.0.1:${failingServer.address().port}/api/inscripcions`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Origin: `http://127.0.0.1:${failingServer.address().port}`,
+      },
       body: JSON.stringify(valid),
     },
   );

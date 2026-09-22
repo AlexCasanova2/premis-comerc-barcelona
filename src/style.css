@@ -11,6 +11,13 @@
   --line: #e5e5e1;
   --cream: #f5f5f1;
 }
+.honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
 * {
   box-sizing: border-box;
 }

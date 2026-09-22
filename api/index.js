@@ -1,5 +1,6 @@
 import { get, list, put } from "@vercel/blob";
 import { createApp } from "../server/app.js";
+import { blobSecurityStore } from "../server/blob-security.js";
 
 const prefix = "inscripcions/";
 
@@ -70,4 +71,7 @@ const storage = {
   },
 };
 
-export default createApp({ storage });
+export default createApp({
+  storage,
+  securityStore: blobSecurityStore({ options: blobOptions }),
+});
