@@ -77,12 +77,6 @@ input:focus-visible,
   align-items: center;
   gap: 9px;
 }
-.eyebrow > span {
-  width: 7px;
-  height: 7px;
-  background: var(--red);
-  border-radius: 50%;
-}
 h1,
 h2,
 p {
@@ -208,66 +202,10 @@ h1 {
   letter-spacing: 2px;
   color: #75756e;
 }
-.breadcrumb {
-  display: flex;
-  gap: 13px;
-  padding-top: 25px;
-  padding-bottom: 25px;
-  color: var(--muted);
-  font-size: 10px;
-}
-.breadcrumb a:hover {
-  text-decoration: underline;
-}
-.breadcrumb > span:last-child {
-  color: #282828;
-}
 .registration {
-  display: grid;
-  grid-template-columns: 1fr 1.72fr;
-  gap: 66px;
-  padding-top: 41px;
+  max-width: 820px;
+  padding-top: 64px;
   padding-bottom: 82px;
-  align-items: start;
-}
-.registration-intro {
-  padding-top: 9px;
-}
-.registration-intro .eyebrow {
-  margin-bottom: 17px;
-}
-.registration-intro h2 {
-  font-size: 31px;
-  letter-spacing: -1.2px;
-  line-height: 1.25;
-  margin-bottom: 24px;
-}
-.registration-intro > p:not(.eyebrow) {
-  font-size: 13px;
-  line-height: 1.8;
-  color: var(--muted);
-  margin-bottom: 18px;
-}
-.intro-note {
-  border-block: 1px solid var(--line);
-  padding: 23px 0;
-  display: flex;
-  gap: 13px;
-  margin-top: 30px;
-  margin-bottom: 25px;
-}
-.note-icon {
-  color: var(--red);
-  font-size: 24px;
-}
-.intro-note strong {
-  font-size: 11px;
-}
-.intro-note p {
-  font-size: 11px;
-  color: var(--muted);
-  margin: 5px 0 0;
-  line-height: 1.5;
 }
 .text-link {
   font-size: 11px;
@@ -590,7 +528,7 @@ footer p {
     height: 480px;
   }
   .registration {
-    gap: 84px;
+    max-width: 860px;
   }
   .form-card {
     padding: 38px 40px;
@@ -616,11 +554,7 @@ footer p {
     display: none;
   }
   .registration {
-    gap: 30px;
-    grid-template-columns: 1fr 1.6fr;
-  }
-  .registration-intro h2 {
-    font-size: 26px;
+    max-width: 760px;
   }
   .form-card {
     padding: 25px 22px;
@@ -692,33 +626,9 @@ footer p {
     bottom: 13px;
     font-size: 7px;
   }
-  .breadcrumb {
-    font-size: 9px;
-    gap: 10px;
-    padding-block: 20px;
-  }
   .registration {
-    grid-template-columns: 1fr;
-    gap: 29px;
-    padding-top: 18px;
+    padding-top: 36px;
     padding-bottom: 48px;
-  }
-  .registration-intro {
-    padding: 0;
-  }
-  .registration-intro h2 {
-    font-size: 30px;
-    margin-bottom: 18px;
-  }
-  .registration-intro h2 br {
-    display: none;
-  }
-  .registration-intro > p:not(.eyebrow) {
-    margin-bottom: 12px;
-  }
-  .intro-note {
-    padding-block: 17px;
-    margin-block: 20px;
   }
   .form-card {
     padding: 25px 20px;

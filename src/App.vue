@@ -83,7 +83,6 @@ async function submit() {
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-inner wrap">
         <div class="hero-copy">
-          <p class="eyebrow"><span></span> EL COMERÇ QUE FA CIUTAT</p>
           <h1 id="hero-title">
             Premi Comerç<br />de Barcelona<span class="red-dot">.</span>
           </h1>
@@ -133,44 +132,11 @@ async function submit() {
       </div>
     </section>
 
-    <div class="breadcrumb wrap">
-      <a :href="officialUrl">Premi Comerç de Barcelona</a
-      ><span aria-hidden="true">/</span><span>Inscripció a l’acte</span>
-    </div>
-
     <section
       id="inscripcio"
       class="registration wrap"
       aria-labelledby="registration-title"
     >
-      <aside class="registration-intro">
-        <p class="eyebrow red-text">ENS HI ACOMPANYES?</p>
-        <h2 id="registration-title">Tu també formes<br /> part del premi.</h2>
-        <p>
-          Un reconeixement a les persones, els establiments i les entitats que
-          donen vida als nostres barris.
-        </p>
-        <p>
-          Omple el formulari per confirmar la teva assistència a l’acte de
-          lliurament del Premi Comerç de Barcelona.
-        </p>
-        <div class="intro-note">
-          <span class="note-icon" aria-hidden="true">↗</span>
-          <div>
-            <strong>Una ciutat. Molt de comerç.</strong>
-            <p>Gràcies per fer-lo possible cada dia.</p>
-          </div>
-        </div>
-        <a
-          class="text-link"
-          :href="officialUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          >Coneix el Premi Comerç <span aria-hidden="true">↗</span
-          ><span class="sr-only"> (s’obre en una pestanya nova)</span></a
-        >
-      </aside>
-
       <div class="form-card">
         <div
           v-if="success"
@@ -192,7 +158,7 @@ async function submit() {
         </div>
         <form v-else @submit.prevent="submit" :aria-busy="pending">
           <div class="form-heading">
-            <h2>Inscripció a l’acte</h2>
+            <h2 id="registration-title">Inscripció a l’acte</h2>
             <p>
               Els camps marcats amb <span class="required">*</span> són
               obligatoris.
