@@ -17,6 +17,7 @@ const initialForm = () => ({
   assistencia: "",
   mobilitat: "",
   consentiment: false,
+  butlletiComerc: false,
 });
 const form = reactive(initialForm());
 const pending = ref(false);
@@ -323,6 +324,20 @@ async function submit() {
                 <span class="required">*</span></span
               ></label
             >
+            <div class="newsletter-option">
+              <label class="consent"
+                ><input
+                  v-model="form.butlletiComerc"
+                  type="checkbox"
+                  name="butlletiComerc"
+                  :disabled="pending"
+                /><span>M’interessa subscriure’m al butlletí de comerç (opcional).</span></label
+              >
+              <p>
+                Per completar la subscripció, accedeix al
+                <a href="https://comunica.barcelona.cat/form/comerc" target="_blank" rel="noopener noreferrer">formulari del butlletí de comerç <span aria-hidden="true">↗</span></a>.
+              </p>
+            </div>
             <p v-if="error" class="error-message" role="alert">{{ error }}</p>
             <button
               class="primary-button submit-button"

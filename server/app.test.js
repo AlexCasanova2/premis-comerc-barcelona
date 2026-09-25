@@ -50,6 +50,7 @@ test("registration API validates, persists and reports storage failures", async 
   assert.equal((await send({ ...valid, email: "invalid" })).status, 400);
   assert.equal((await send({ ...valid, acompanyant: "Sí" })).status, 400);
   assert.equal((await send({ ...valid, mobilitat: "maybe" })).status, 400);
+  assert.equal((await send({ ...valid, butlletiComerc: "Sí" })).status, 400);
   const response = await send({ ...valid, nomAcompanyant: "Stale value" });
   assert.equal(response.status, 201);
   assert.equal((await response.json()).ok, true);
@@ -61,6 +62,7 @@ test("registration API validates, persists and reports storage failures", async 
         nomAcompanyant: "Acompanyant",
         cognomAcompanyant: "Prova",
         mobilitat: "Sí",
+        butlletiComerc: true,
       })
     ).status,
     201,
@@ -73,6 +75,8 @@ test("registration API validates, persists and reports storage failures", async 
   assert.equal(entries[0].nomAcompanyant, "");
   assert.equal(entries[1].nomAcompanyant, "Acompanyant");
   assert.equal(entries[0].consentiment, true);
+  assert.equal(entries[0].butlletiComerc, false);
+  assert.equal(entries[1].butlletiComerc, true);
   assert.ok(entries[0].createdAt);
   assert.notEqual(entries[0].id, entries[1].id);
 
@@ -110,6 +114,8 @@ test("registration API validates, persists and reports storage failures", async 
   const csv = new TextDecoder().decode(csvBytes);
   assert.match(csv, /"Prova"/);
   assert.match(csv, /"Acompanyant"/);
+  assert.match(csv, /"Interès en el butlletí de comerç"/);
+  assert.match(csv, /"true"/);
 
   const failingServer = createApp({
     dataDir: join(dir, "inscripcions.jsonl"),

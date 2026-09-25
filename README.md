@@ -54,7 +54,7 @@ Para ejecutar la función de Vercel fuera de la plataforma también se necesita 
 
 ## Formulario
 
-Campos del CSV original: nombre, apellido, email, teléfono, acompañante sí/no, nombre y apellido del acompañante (condicionales), entidad/asociación, dirección de la entidad, confirmación de asistencia, asistencia por movilidad reducida y consentimiento. Los metadatos de Elementor no son campos del formulario.
+Campos del CSV original: nombre, apellido, email, teléfono, acompañante sí/no, nombre y apellido del acompañante (condicionales), entidad/asociación, dirección de la entidad, confirmación de asistencia, asistencia por movilidad reducida y consentimiento. Los metadatos de Elementor no son campos del formulario. También se guarda el interés opcional en el boletín de comercio; la suscripción se completa por separado en el formulario externo enlazado.
 
 El navegador y la API validan los campos. `POST /api/inscripcions` guarda cada inscripción en `data/inscripcions.jsonl` (una línea JSON por inscripción), incluyendo UUID, fecha y texto de consentimiento. El mensaje **«Inscripció rebuda correctament.»** solo aparece tras una respuesta de guardado correcta. Si falla, se conservan los campos y se permite reintentar. No se envían correos de confirmación.
 

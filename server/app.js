@@ -21,6 +21,7 @@ const csvColumns = [
   ["Confirmació d’assistència", "assistencia"],
   ["Assistència per mobilitat reduïda", "mobilitat"],
   ["Consentiment", "consentText"],
+  ["Interès en el butlletí de comerç", "butlletiComerc"],
   ["ID", "id"],
   ["Data d’inscripció", "createdAt"],
 ];
@@ -171,10 +172,16 @@ export function createApp({
           return res
             .status(400)
             .json({ error: "Cal acceptar el tractament de les dades." });
+        if (
+          input.butlletiComerc !== undefined &&
+          typeof input.butlletiComerc !== "boolean"
+        )
+          return res.status(400).json({ error: "El formulari no és vàlid." });
         if (entry.acompanyant === "No")
           Object.assign(entry, { nomAcompanyant: "", cognomAcompanyant: "" });
         Object.assign(entry, {
           consentiment: true,
+          butlletiComerc: input.butlletiComerc === true,
           consentText,
           id: randomUUID(),
           createdAt: new Date().toISOString(),

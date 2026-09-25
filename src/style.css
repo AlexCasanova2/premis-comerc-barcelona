@@ -328,6 +328,19 @@ fieldset {
   flex-shrink: 0;
   margin: 2px 0 0;
 }
+.newsletter-option {
+  margin-top: 16px;
+}
+.newsletter-option p {
+  margin: 4px 0 0 27px;
+  font-size: 10px;
+  line-height: 1.8;
+  color: #656561;
+}
+.newsletter-option a {
+  color: var(--red);
+  text-decoration: underline;
+}
 .submit-button {
   width: 100%;
   margin-top: 23px;
@@ -534,7 +547,7 @@ footer p {
     font-size: 16px;
     height: 46px;
   }
-  .consent {
+  .consent, .newsletter-option p {
     font-size: 11px;
   }
   .field-hint {
