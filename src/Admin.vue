@@ -8,6 +8,7 @@ const registrations = ref([]);
 const query = ref("");
 const loading = ref(false);
 const exporting = ref(false);
+const deletingId = ref(null);
 const error = ref("");
 
 const filteredRegistrations = computed(() => {
@@ -150,6 +151,33 @@ async function exportCsv() {
     error.value = cause.message;
   } finally {
     exporting.value = false;
+  }
+}
+
+async function softDelete(entry) {
+  if (
+    deletingId.value ||
+    !window.confirm(
+      `Vols donar de baixa la inscripció de ${entry.nom} ${entry.cognom}? Deixarà d’aparèixer al CRM i al CSV.`,
+    )
+  )
+    return;
+  deletingId.value = entry.id;
+  error.value = "";
+  try {
+    await api(`/api/admin/inscripcions/${entry.id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    });
+    if (auth.value)
+      registrations.value = registrations.value.filter(
+        (item) => item.id !== entry.id,
+      );
+  } catch (cause) {
+    error.value = cause.message;
+  } finally {
+    deletingId.value = null;
   }
 }
 
@@ -309,6 +337,7 @@ onUnmounted(() => clearTimeout(expiryTimer));
                   <th>Acompanyant</th>
                   <th>Mobilitat</th>
                   <th>Interès butlletí</th>
+                  <th>Accions</th>
                 </tr>
               </thead>
               <tbody>
@@ -357,6 +386,17 @@ onUnmounted(() => clearTimeout(expiryTimer));
                       >{{ entry.butlletiComerc ? "Sí" : "No" }}</span
                     >
                     <span v-else>—</span>
+                  </td>
+                  <td data-label="Accions">
+                    <button
+                      class="delete-button"
+                      type="button"
+                      :disabled="deletingId !== null"
+                      :aria-label="`Dona de baixa la inscripció de ${entry.nom} ${entry.cognom}`"
+                      @click="softDelete(entry)"
+                    >
+                      {{ deletingId === entry.id ? "Donant de baixa…" : "Dona de baixa" }}
+                    </button>
                   </td>
                 </tr>
               </tbody>

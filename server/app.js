@@ -53,10 +53,17 @@ export function createApp({
     async list() {
       try {
         const contents = await readFile(registrationsFile, "utf8");
-        return contents
-          .split("\n")
-          .filter(Boolean)
-          .map((line) => JSON.parse(line));
+        const entries = new Map();
+        for (const line of contents.split("\n").filter(Boolean)) {
+          const item = JSON.parse(line);
+          if (item.deletedAt) {
+            const entry = entries.get(item.id);
+            if (entry) entry.deletedAt = item.deletedAt;
+          } else {
+            entries.set(item.id, item);
+          }
+        }
+        return [...entries.values()];
       } catch (error) {
         if (error.code === "ENOENT") return [];
         throw error;
@@ -68,12 +75,17 @@ export function createApp({
         mode: 0o600,
       });
     },
+    async softDelete(id, deletedAt) {
+      await appendFile(registrationsFile, JSON.stringify({ id, deletedAt }) + "\n", {
+        mode: 0o600,
+      });
+    },
   };
 
   async function registrations() {
-    return (await registrationStorage.list()).sort((a, b) =>
-      String(b.createdAt).localeCompare(String(a.createdAt)),
-    );
+    return (await registrationStorage.list())
+      .filter((entry) => !entry.deletedAt)
+      .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
   }
 
   app.disable("x-powered-by");
@@ -233,6 +245,27 @@ export function createApp({
             }),
           );
         res.send(`\uFEFF${csv}`);
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
+  app.delete(
+    "/api/admin/inscripcions/:id",
+    requireAdmin,
+    limit("admin-delete", 20),
+    async (req, res, next) => {
+      try {
+        if (!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(req.params.id))
+          return res.status(400).json({ error: "Identificador no vàlid." });
+        const entry = (await registrations()).find(
+          (item) => item.id === req.params.id,
+        );
+        if (!entry)
+          return res.status(404).json({ error: "Inscripció no trobada." });
+        await registrationStorage.softDelete(entry.id, new Date().toISOString());
+        res.json({ ok: true });
       } catch (error) {
         next(error);
       }

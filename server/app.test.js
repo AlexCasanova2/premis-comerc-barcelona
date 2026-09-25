@@ -117,6 +117,40 @@ test("registration API validates, persists and reports storage failures", async 
   assert.match(csv, /"Interès en el butlletí de comerç"/);
   assert.match(csv, /"true"/);
 
+  const remove = (id, headers = {}) =>
+    fetch(`${adminUrl}/inscripcions/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: new URL(url).origin,
+        ...headers,
+      },
+      body: "{}",
+    });
+  assert.equal((await remove(entries[0].id)).status, 401);
+  assert.equal((await remove("not-a-uuid", { Cookie: cookie })).status, 400);
+  assert.equal((await remove(entries[0].id, { Cookie: cookie })).status, 200);
+  assert.equal((await remove(entries[0].id, { Cookie: cookie })).status, 404);
+  const remaining = await fetch(`${adminUrl}/inscripcions`, {
+    headers: { Cookie: cookie },
+  });
+  assert.deepEqual(
+    (await remaining.json()).registrations.map((entry) => entry.id),
+    [entries[1].id],
+  );
+  const csvAfterDelete = await fetch(`${adminUrl}/inscripcions.csv`, {
+    headers: { Cookie: cookie },
+  });
+  assert.doesNotMatch(await csvAfterDelete.text(), new RegExp(entries[0].id));
+  const storedLines = (await readFile(join(dir, "inscripcions.jsonl"), "utf8"))
+    .trim()
+    .split("\n")
+    .map(JSON.parse);
+  assert.equal(storedLines.length, 3);
+  assert.equal(storedLines[0].id, entries[0].id);
+  assert.equal(storedLines[2].id, entries[0].id);
+  assert.ok(storedLines[2].deletedAt);
+
   const failingServer = createApp({
     dataDir: join(dir, "inscripcions.jsonl"),
   }).listen(0, "127.0.0.1");
