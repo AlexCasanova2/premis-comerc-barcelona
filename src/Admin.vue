@@ -308,6 +308,7 @@ onUnmounted(() => clearTimeout(expiryTimer));
                   <th>Assistència</th>
                   <th>Acompanyant</th>
                   <th>Mobilitat</th>
+                  <th>Interès butlletí</th>
                 </tr>
               </thead>
               <tbody>
@@ -347,6 +348,15 @@ onUnmounted(() => clearTimeout(expiryTimer));
                       :class="entry.mobilitat === 'Sí' ? 'attention' : 'no'"
                       >{{ entry.mobilitat }}</span
                     >
+                  </td>
+                  <td data-label="Interès butlletí">
+                    <span
+                      v-if="typeof entry.butlletiComerc === 'boolean'"
+                      class="status"
+                      :class="entry.butlletiComerc ? 'yes' : 'no'"
+                      >{{ entry.butlletiComerc ? "Sí" : "No" }}</span
+                    >
+                    <span v-else>—</span>
                   </td>
                 </tr>
               </tbody>
