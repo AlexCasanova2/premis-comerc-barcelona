@@ -241,8 +241,8 @@ export function installSecurity(
 
   app.get(
     "/api/admin/session",
-    limit("session-ip", 120),
     requireAdmin,
+    limit("session-ip", 120),
     (req, res) => res.json({ ok: true, expiresAt: req.adminSession.expiresAt }),
   );
   app.post("/api/admin/logout", async (req, res, next) => {

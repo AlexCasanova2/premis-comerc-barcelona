@@ -43,6 +43,20 @@ async function setup(t, options = {}) {
   return { base, post, login, entries };
 }
 
+test("anonymous session checks do not consume shared Blob operations", async (t) => {
+  let operations = 0;
+  const unexpectedOperation = async () => {
+    operations++;
+    throw new Error("STORE_UNAVAILABLE");
+  };
+  const { base } = await setup(t, {
+    securityStore: { get: unexpectedOperation, increment: unexpectedOperation },
+  });
+  const response = await fetch(`${base}/api/admin/session`);
+  assert.equal(response.status, 401);
+  assert.equal(operations, 0);
+});
+
 test("opaque HttpOnly sessions, rotation, logout revocation and no Basic bypass", async (t) => {
   const { base, login, post } = await setup(t);
   assert.equal((await fetch(`${base}/api/admin/inscripcions.csv`)).status, 401);

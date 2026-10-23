@@ -1,6 +1,7 @@
-import { get, list, put } from "@vercel/blob";
+import { list, put } from "@vercel/blob";
 import { createApp } from "../server/app.js";
 import { blobSecurityStore } from "../server/blob-security.js";
+import { blobRegistrationReader } from "../server/blob-registration-reader.js";
 
 const prefix = "inscripcions/";
 const deletedPrefix = "inscripcions-baixes/";
@@ -24,6 +25,8 @@ function blobError(error) {
   wrapped.publicMessage = `No s’ha pogut accedir al Blob (${error.name || "error desconegut"}). Revisa els Runtime Logs de Vercel.`;
   return wrapped;
 }
+
+const readRegistration = blobRegistrationReader({ options: blobOptions });
 
 const storage = {
   async save(entry) {
@@ -72,16 +75,7 @@ const storage = {
       return await Promise.all(
         blobs
           .filter((blob) => !deletedIds.has(blob.pathname.slice(-41, -5)))
-          .map(async (blob) => {
-            const response = await get(blob.pathname, {
-              ...options,
-              access: "private",
-              useCache: false,
-            });
-            if (!response)
-              throw new Error(`Registration blob not found: ${blob.pathname}`);
-            return new Response(response.stream).json();
-          }),
+          .map((blob) => readRegistration(blob.pathname)),
       );
     } catch (error) {
       throw blobError(error);
